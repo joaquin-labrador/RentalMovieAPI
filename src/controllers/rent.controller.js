@@ -12,25 +12,22 @@ const gentRents = async (req, res) => {
     let { limit, offset, order } = req.query;
 
     order ? (order = order) : (order = "asc");
-    
+
     let rents = await prisma.rent.findMany({
       orderBy: {
         id: order,
       },
-      
     });
-    
-    rents = limitAndOffset( limit, offset, rents);
-    
-    rents.length > 0  
-    ? res.status(200).json(rents)
-    : res.status(404).json({ errorMessage: "Rent not found" });
-   
 
+    rents = limitAndOffset(limit, offset, rents);
+
+    rents.length > 0
+      ? res.status(200).json(rents)
+      : res.status(404).json({ errorMessage: "Rent not found" });
   } catch (error) {
     console.log(error);
     const { name } = error;
-    const errorMessage = prismaError[name] || "Internal server error";
+    const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
   }
 };
@@ -50,7 +47,7 @@ const getRentById = async (req, res) => {
       : res.status(404).json({ errorMessage: "Rent not found" });
   } catch (error) {
     const { name } = error;
-    const errorMessage = prismaError[name] || "Internal server error";
+    const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
   }
 };
@@ -76,7 +73,7 @@ const getRentByUserId = async (req, res) => {
   } catch (error) {
     console.log(error);
     const { name } = error;
-    const errorMessage = prismaError[name] || "Internal server error";
+    const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
   }
 };
@@ -133,7 +130,7 @@ const addRent = async (req, res) => {
   } catch (error) {
     console.log(error);
     const { name } = error;
-    const errorMessage = prismaError[name] || "Internal server error";
+    const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
   }
 };
@@ -179,26 +176,124 @@ const returnRent = async (req, res) => {
       },
     });
 
-    res
-      .status(200)
-      .json({
-        message: "The movie was returned",
-        price: rentPrice(rent.user_return_date, rent.return_date),
-      });
+    res.status(200).json({
+      message: "The movie was returned",
+      price: rentPrice(rent.user_return_date, rent.return_date),
+    });
   } catch (error) {
     console.log(error);
 
     const { name } = error;
 
-    const errorMessage = prismaError[name] || "Internal server error";
+    const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
   }
 };
 
+const cancelRent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const rent = await prisma.rent.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    const today = new Date();
+
+    if (!rent) return res.status(404).json({ errorMessage: "Rent not found" });
+    if (
+      rent.rent_date.getDay() != today.getDay() &&
+      rent.rent_date.getFullYear() != today.getFullYear() &&
+      rent.rent_date.getMonth() != today.getMonth()
+    ) {
+      return res.status(400).json({ errorMessage: "Rent can't be canceled" });
+    } //if the rent is not the same day
+    if (rent.id_user != req.id)
+      res
+        .status(401)
+        .json({ errorMessage: "You are not authorized to cancel this rent" });
+
+    await prisma.rent.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+    console.log(rent.id_movie);
+
+    await prisma.movie.update({
+      where: {
+        code: rent.id_movie,
+      },
+      data: {
+        stock: {
+          increment: 1,
+        },
+        rentals: {
+          decrement: 1,
+        },
+      },
+    });
+
+    res.status(200).json({ message: "Rent canceled" });
+  } catch (error) {
+    console.log(error);
+    const { name } = error;
+    const errorMessage = prismaError[name] || error.message;
+    res.status(500).json({ errorMessage });
+  }
+};
+
+const deleteRent = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    console.log(req.isAdmin);
+    if (!req.isAdmin)
+      return res
+        .status(401)
+        .json({ errorMessage: "You are not authorized to delete this rent" });
+
+    const rent = await prisma.rent.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    await prisma.rent.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    await prisma.movie.update({
+      where: {
+        code: rent.id_movie,
+      },
+      data: {
+        stock: {
+          increment: 1,
+        },
+        rentals: {
+          decrement: 1,
+        },
+      },
+    });
+
+    res.status(200).json({ message: "Rent deleted" });
+  } catch (error) {
+    console.log(error);
+    const { name } = error;
+    const errorMessage = prismaError[name] || error.message;
+    res.status(500).json({ errorMessage });
+  }
+};
 module.exports = {
   gentRents,
   getRentById,
   getRentByUserId,
   addRent,
   returnRent,
+  cancelRent,
+  deleteRent,
 };
