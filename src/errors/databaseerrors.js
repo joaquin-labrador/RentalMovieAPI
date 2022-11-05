@@ -26,6 +26,7 @@ const prismaError = {
   PrismaClientUnknownRequestError: "PrismaClientUnknownRequestError",
   PrismaClientRustPanicError: "PrismaClientRustPanicError",
   PrismaClientInitializationError: "PrismaClientInitializationError",
+  Error: "NotFoundError",
 };
 module.exports = {
   sequelizeError,
