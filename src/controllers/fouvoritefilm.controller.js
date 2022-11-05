@@ -37,7 +37,7 @@ const getFavouriteFilmById = async (req, res) => {
     let favouriteFilm = await prisma.favouriteFilm.findUnique({
       where: {
         id: parseInt(id),
-      }
+      },
     });
 
     favouriteFilm
@@ -52,7 +52,6 @@ const getFavouriteFilmById = async (req, res) => {
 
 const getFavouriteFilmByUserId = async (req, res) => {
   try {
-  
     const { limit, offset, order } = req.query;
     let favouriteFilm = await prisma.favouriteFilm.findMany({
       where: {
@@ -78,7 +77,7 @@ const getFavouriteFilmByUserId = async (req, res) => {
 const createFavouriteFilm = async (req, res) => {
   try {
     let { film_id, review } = req.body;
-    
+
     //the user only one review per film
     const verifyFavouriteFilm = await prisma.favouriteFilm.findMany({
       where: {
@@ -87,11 +86,13 @@ const createFavouriteFilm = async (req, res) => {
       },
     });
 
-    if(verifyFavouriteFilm.length > 0) 
-      return res.status(400).json({ errorMessage: "Film already added to favorite" });
-   
-    const userId = { connect : { id: req.id } };
-    const filmId = { connect : { code: film_id } };
+    if (verifyFavouriteFilm.length > 0)
+      return res
+        .status(400)
+        .json({ errorMessage: "Film already added to favorite" });
+
+    const userId = { connect: { id: req.id } };
+    const filmId = { connect: { code: film_id } };
     const favouriteFilm = await prisma.favouriteFilm.create({
       data: {
         movie: filmId,
@@ -110,14 +111,72 @@ const createFavouriteFilm = async (req, res) => {
   }
 };
 
+const updateReview = async (req, res) => {
+  try {
+    const { review, id } = req.body;
+    const favouriteFilm = await prisma.favouriteFilm.updateMany({
+      where: {
+        id_user: parseInt(req.id),
+        id: id,
+      },
+      data: {
+        review: review,
+      },
+    });
+    favouriteFilm
+      ? res.status(200).json({ ok: "Review updated" })
+      : res.status(404).json({ errorMessage: "Favorite film not found" });
+  } catch (error) {
+    console.log(error);
+    const { name } = error;
+    const errorMessage = prismaError[name] || error.message;
+    res.status(500).json({ errorMessage });
+  }
+};
 
+const deleteFavouriteFilm = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { count } = await prisma.favouriteFilm.deleteMany({
+      where: {
+        id_user: parseInt(req.id),
+        id: parseInt(id),
+      },
+    });
 
+    count > 0
+      ? res.status(200).json({ ok: "Favorite film deleted" })
+      : res.status(404).json({ errorMessage: "Favorite film not found" });
+  } catch (error) {
+    const { name } = error;
+    const errorMessage = prismaError[name] || error.message;
+    res.status(500).json({ errorMessage });
+  }
+};
 
-
-
+const deleteAdminFavouriteFilm = async (req, res) => {
+  console.log("deleteAdminFavouriteFilm");
+  try {
+    if(! req.isAdmin) return res.status(401).json({errorMessage: "Unauthorized"})
+    const { id } = req.params;
+     await prisma.favouriteFilm.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+    res.status(404).json({ notFound: "Favorite film not found" });
+  } catch (error) {
+    const { name } = error;
+    const errorMessage = prismaError[name] || error.message;
+    res.status(500).json({ errorMessage });
+  }
+};
 module.exports = {
   getAllFavouriteFilms,
   getFavouriteFilmById,
   getFavouriteFilmByUserId,
   createFavouriteFilm,
+  updateReview,
+  deleteFavouriteFilm,
+  deleteAdminFavouriteFilm,
 };

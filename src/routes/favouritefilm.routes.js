@@ -9,7 +9,11 @@ router.get(
   requireToken,
   favouriteFilmController.getFavouriteFilmByUserId
 );
-router.get("/:id", requireToken, favouriteFilmController.getFavouriteFilmById);
+router.put("/", requireToken, favouriteFilmController.updateReview);
 router.post("/", requireToken, favouriteFilmController.createFavouriteFilm);
+router.delete("/:id", requireToken, favouriteFilmController.deleteFavouriteFilm);
+router.get("/:id", requireToken, favouriteFilmController.getFavouriteFilmById);
+router.delete("/admin/:id", requireToken, favouriteFilmController.deleteAdminFavouriteFilm);
+
 
 module.exports = router;
