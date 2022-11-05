@@ -25,7 +25,6 @@ const gentRents = async (req, res) => {
       ? res.status(200).json(rents)
       : res.status(404).json({ errorMessage: "Rent not found" });
   } catch (error) {
-    console.log(error);
     const { name } = error;
     const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
@@ -71,7 +70,6 @@ const getRentByUserId = async (req, res) => {
       ? res.status(200).json(rents)
       : res.status(404).json({ errorMessage: "Rent not found" });
   } catch (error) {
-    console.log(error);
     const { name } = error;
     const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
@@ -128,7 +126,6 @@ const addRent = async (req, res) => {
 
     res.status(201).json({ message: "Rent created", rent });
   } catch (error) {
-    console.log(error);
     const { name } = error;
     const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
@@ -181,7 +178,6 @@ const returnRent = async (req, res) => {
       price: rentPrice(rent.user_return_date, rent.return_date),
     });
   } catch (error) {
-    console.log(error);
 
     const { name } = error;
 
@@ -237,7 +233,6 @@ const cancelRent = async (req, res) => {
 
     res.status(200).json({ message: "Rent canceled" });
   } catch (error) {
-    console.log(error);
     const { name } = error;
     const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
@@ -248,7 +243,6 @@ const deleteRent = async (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log(req.isAdmin);
     if (!req.isAdmin)
       return res
         .status(401)
@@ -282,7 +276,6 @@ const deleteRent = async (req, res) => {
 
     res.status(200).json({ message: "Rent deleted" });
   } catch (error) {
-    console.log(error);
     const { name } = error;
     const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
