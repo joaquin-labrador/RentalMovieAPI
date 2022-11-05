@@ -6,6 +6,7 @@ const {
   isSecurePassword,
   repasswordMatch,
 } = require("../middleware/auth.middleware");
+const { requireToken } = require("../middleware/requiretoken");
 
 router.post(
   "/signup",
@@ -16,5 +17,7 @@ router.post(
 );
 router.post("/login", authController.login);
 router.get("/logout", authController.logout);
+router.get("/verify/:id", authController.verify);
+router.put("/updateToAdmin/:id", requireToken ,authController.updateToAdmin);
 
 module.exports = router;
