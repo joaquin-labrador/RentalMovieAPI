@@ -24,9 +24,8 @@ const getAllFavouriteFilms = async (req, res) => {
       ? res.status(200).json(favouriteFilms)
       : res.status(404).json({ errorMessage: "Favorite film not found" });
   } catch (error) {
-    console.log(error);
     const { name } = error;
-    const errorMessage = prismaError[name] || "Internal server error";
+    const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
   }
 };
@@ -45,9 +44,8 @@ const getFavouriteFilmById = async (req, res) => {
       ? res.status(200).json(favouriteFilm)
       : res.status(404).json({ errorMessage: "Favorite film not found" });
   } catch (error) {
-    console.log(error);
     const { name } = error;
-    const errorMessage = prismaError[name] || "Internal server error";
+    const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
   }
 };
@@ -71,9 +69,8 @@ const getFavouriteFilmByUserId = async (req, res) => {
       ? res.status(200).json(favouriteFilm)
       : res.status(404).json({ errorMessage: "Favorite film not found" });
   } catch (error) {
-    console.log(error);
     const { name } = error;
-    const errorMessage = prismaError[name] || "Internal server error";
+    const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
   }
 };
@@ -107,9 +104,8 @@ const createFavouriteFilm = async (req, res) => {
       ? res.status(201).json(favouriteFilm)
       : res.status(404).json({ errorMessage: "Favorite film not found" });
   } catch (error) {
-    console.log(error);
     const { name } = error;
-    const errorMessage = prismaError[name] || "Internal server error";
+    const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
   }
 };

@@ -26,7 +26,7 @@ const singUp = async (req, res) => {
   } catch (error) {
     console.log(error);
     const { name } = error;
-    const errorMessage = prismaError[name] || "Internal server error";
+    const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
   }
 };
@@ -64,7 +64,7 @@ const login = async (req, res) => {
   } catch (error) {
     console.log(error);
     const { name } = error;
-    const errorMessage = prismaError[name] || "Internal server error";
+    const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
   }
 };
