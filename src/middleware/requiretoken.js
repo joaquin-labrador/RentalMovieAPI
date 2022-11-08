@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
     const { token } = req.cookies;
     
     if (!token) {
-      return res.status(401).send(jwtErrors["invalid token"]);
+      return res.status(401).json(jwtErrors["invalid token"]);
     }
     
     const { id, isAdmin } = jwt.verify(token, process.env.JWT_SECRET);
@@ -19,7 +19,7 @@ const jwt = require("jsonwebtoken");
     const { message } = error;
     const errorMessage = jwtErrors[message] || "Something went wrong";
 
-    res.status(401).send(errorMessage);
+    res.status(401).json(errorMessage);
   }
 };
 

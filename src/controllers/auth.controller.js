@@ -13,21 +13,29 @@ const testAccount = () => {
 
 const singUp = async (req, res) => {
   try {
-    const { username, email, password, dni, phone } = req.body;
+    const {email, password, dni, phone } = req.body;
 
     const hashedPassword = await bycrypt.hash(password, 12);
 
     const newUser = {
-      username: username,
       email: email,
       password: hashedPassword,
-      isAdmin: false,
       dni: dni,
       phone: phone,
+      isAdmin: false,
+      isValidate: false,
     };
 
     const userDB = await prisma.user.create({
-      data: newUser,
+      data: {
+        email: newUser.email,
+        password: newUser.password,
+        dni: newUser.dni,
+        phone: newUser.phone,
+        isAdmin: newUser.isAdmin,
+        isValidate: newUser.isValidate,
+        
+      }
     });
     
     await nodemailer.createTestAccount();
@@ -56,12 +64,13 @@ const singUp = async (req, res) => {
       } else {
         console.log("Email sent: " + info.response);
         return res
-          .status(200)
-          .json({ message: "Email of verification is send " });
+          .status(201)
+          .json({ message: "Email of verification is send" });
       }
     });
 
   } catch (error) {
+    console.log(error);
     const { name } = error;
     const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });
@@ -102,6 +111,7 @@ const login = async (req, res) => {
 
     res.status(200).json({ token });
   } catch (error) {
+    console.log(error);
     const { name } = error;
     const errorMessage = prismaError[name] || error.message;
     res.status(500).json({ errorMessage });

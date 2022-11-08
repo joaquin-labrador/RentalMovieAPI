@@ -25,7 +25,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
 
@@ -36,3 +36,8 @@ app.use("/api/favouritefilm", favouriteFilmRoutes);
 app.use(errorHandler, (req, res) => {
   res.status(404).json({ errorMessage: "Not found" });
 });
+
+module.exports = {
+  app,
+  server,
+}
