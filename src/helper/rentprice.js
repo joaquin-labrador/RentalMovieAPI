@@ -2,9 +2,9 @@ const RENT_PRICE = 100;
 
 const rentPrice = (user_return_date, renturn_date) => {
   const userReturnDate = new Date(user_return_date);
-  const renturnDate = new Date(renturn_date);
+  const returnDate = new Date(renturn_date);
 
-  const dateDiference = userReturnDate.getTime() - renturnDate.getTime();
+  const dateDiference = userReturnDate.getTime() - returnDate.getTime();
   const daysDiference = dateDiference / (1000 * 60 * 60 * 24);
 
   if (daysDiference < 0) return RENT_PRICE;
