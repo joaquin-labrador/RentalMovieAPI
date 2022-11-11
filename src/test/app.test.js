@@ -8,10 +8,6 @@ const { PrismaClient } = require("@prisma/client");
 const { describe } = require("mocha");
 const prisma = new PrismaClient();
 
-afterEach(async () => {
-  await prisma.user.deleteMany();
-});
-
 beforeEach(async () => {
   await prisma.user.deleteMany();
 });
@@ -133,7 +129,7 @@ it("should return status 200 get all rents", (done) => {
     .then((response) => {
       request(app)
         .get("/api/rent")
-        .set("Authorization", `Bearer ${response._body.token}`)
+        .set("Cookie",  [`token=${response._body.token}`])
         .expect(200)
         .then((response) => {
           assert.isNotEmpty(response._body); //no esta vacio
@@ -160,7 +156,7 @@ it("should return status 200 get rent by user id", (done) => {
     .then((response) => {
       request(app)
         .get("/api/rent/user")
-        .set("Authorization", `Bearer ${response._body.token}`)
+        .set("Cookie",  [`token=${response._body.token}`])
         .expect(200)
         .then((response) => {
           assert.isNotEmpty(response._body); //no esta vacio
@@ -187,7 +183,7 @@ it("should return status 200 get rent by id", (done) => {
     .then((response) => {
       request(app)
         .get("/api/rent/1")
-        .set("Authorization", `Bearer ${response.body.token}`)
+        .set("Cookie",  [`token=${response._body.token}`])
         .expect(200)
         .then((response) => {
           assert.isNotEmpty(response._body); //no esta vacio
@@ -213,7 +209,7 @@ it("should return 201 status when you add a rent", (done) => {
     .then((response) => {
       request(app)
         .post("/api/rent")
-        .set({ Authorization: `Bearer ${response._body.token}` })
+        .set("Cookie",  [`token=${response._body.token}`])
         .send({
           movie_id: "112c1e67-726f-40b1-ac17-6974127bb9b9",
         })
@@ -233,7 +229,7 @@ it("should return 200 status when you return a movie", (done) => {
     .then((response) => {
       request(app)
         .put("/api/rent/1")
-        .set({ Authorization: `Bearer ${response._body.token}` })
+        .set("Cookie",  [`token=${response._body.token}`])
         .expect(200)
         .end((err, response) => {
           if (err) return done(err);
@@ -250,7 +246,7 @@ it("should return 200 status when you delete a rent", (done) => {
     .then((response) => {
       request(app)
         .delete("/api/rent/1")
-        .set({ Authorization: `Bearer ${response._body.token}` })
+        .set("Cookie",  [`token=${response._body.token}`])
         .expect(200)
         .end((err, response) => {
           if (err) return done(err);
@@ -267,7 +263,7 @@ it("should return 201 status add favourite movie", (done) => {
     .then((response) => {
       request(app)
         .post("/api/favourite")
-        .set({ Authorization: `Bearer ${response._body.token}` })
+        .set("Cookie",  [`token=${response._body.token}`])
         .send({
           film_id: "112c1e67-726f-40b1-ac17-6974127bb9b9",
           review: "test review",
@@ -288,7 +284,7 @@ it("should return 200 status get all favourite movies", (done) => {
     .then((response) => {
       request(app)
         .get("/api/favourite")
-        .set({ Authorization: `Bearer ${response._body.token}` })
+        .set("Cookie",  [`token=${response._body.token}`])
         .expect(201)
         .then((response) => {
           assert.isNotEmpty(response._body); //no esta vacio
@@ -315,7 +311,7 @@ it("should return 200 status get favourite movie by id", (done) => {
     .then((response) => {
       request(app)
         .get("/api/favourite/1")
-        .set({ Authorization: `Bearer ${response._body.token}` })
+        .set("Cookie",  [`token=${response._body.token}`])
         .expect(200)
         .then((response) => {
           assert.isNotEmpty(response._body); //no esta vacio
@@ -342,7 +338,7 @@ it("should return 200 status when you delete a favourite movie", (done) => {
     .then((response) => {
       request(app)
         .delete("/api/favourite/1")
-        .set({ Authorization: `Bearer ${response._body.token}` })
+        .set("Cookie",  [`token=${response._body.token}`])
         .expect(200)
         .end((err, response) => {
           if (err) return done(err);
@@ -359,7 +355,7 @@ it("should return 200 status when you update a review of a favourite movie", (do
     .then((response) => {
       request(app)
         .put("/api/favourite/1")
-        .set({ Authorization: `Bearer ${response._body.token}` })
+        .set("Cookie",  [`token=${response._body.token}`])
         .send({
           id: 1,
           review: "test review",
