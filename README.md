@@ -1,4 +1,4 @@
-it's a API REST CRUD based on the idea of an online movie rental system, use a SQL data base (mySQL)
+it's a API REST CRUD based on the idea of an online movie rental system, use a SQL data base (mySQL), work with Prisma ORM Data Base
 
 # Developer: *Joaquin Labrador 👨‍💻*
 
